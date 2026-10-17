@@ -1,37 +1,22 @@
-fn main() {
-    println!("Hello, world!");
+use std::time::Duration;
+
+#[tokio::main(flavor = "multi_thread", worker_threads = 10)]
+async fn main() {
+    let pipe = nefe::pipe_tokio::new().await;
+    tokio::time::sleep(Duration::from_secs(10)).await;
+    let l = pipe.EnableLogController.0.lock().unwrap();
+    eprintln!("l: {}", l.count);
+    let mnt = pipe.make_number_time.load(std::sync::atomic::Ordering::Relaxed);
+    let mvt = pipe.make_value_time.load(std::sync::atomic::Ordering::Relaxed);
+    let lot = pipe.log_out_time.load(std::sync::atomic::Ordering::Relaxed);
+    eprintln!("mnt: {:?}", Duration::from_nanos(mnt));
+    eprintln!("mvt: {:?}", Duration::from_nanos(mvt));
+    eprintln!("lot: {:?}", Duration::from_nanos(lot));
 }
 
-// nefe can add values to a Generate Queue
-// Consume Queue will distribute one message to one actor. Message may be taken
-//#[nefe(queue(consume, generate), onqueue_on_timer(1s))]
-pub struct MakeNumberInput {
-    //#[nefe(value_generator = counter)]
-    pub call_count: u64,
-}
-
-#[derive(Debug)]
-// Share Queue will distribute every message to every actor. Message must be used as a reference
-//#[nefe(queue(share))]
-pub struct Value {
-    pub v: String,
-}
-
-//#[nefe(onqueue(Value))]
-pub fn make_value(input: MakeNumberInput) -> Value {
-    Value {
-        v: (input.call_count * 2).to_string(),
-    }
-}
-
-//#[nefe(queue(share, generate), onqueue_on_demand)]
-pub struct EnableLog {
-    // Value is defined by the executor of the pipeline
-    //#[nefe(user_value)]
-    pub enable: bool,
-}
-
-//#[nefe(dequeue(&Value), dequeue(&EnableLog))]
-pub fn log_out(value: Value) {
-    eprintln!("{value:?}");
+fn _main() {
+    let pipe = nefe::pipe::new();
+    std::thread::sleep(Duration::from_secs(10));
+    let l = pipe.EnableLogController.0.lock().unwrap();
+    eprintln!("{}", l.count);
 }

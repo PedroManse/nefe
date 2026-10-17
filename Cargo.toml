@@ -4,9 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+tokio = { version = "1.53.3", features = ["macros", "rt-multi-thread", "sync", "time"] }
 [lints.clippy]
 perf = { level = "deny", priority = -1 }
 style = { level = "deny", priority = -1 }
 pedantic = { level = "deny", priority = -1 }
-unwrap-used = "warn"
-missing-errors-doc = "warn"
+unwrap_used = "warn"
+missing_errors_doc = "warn"
